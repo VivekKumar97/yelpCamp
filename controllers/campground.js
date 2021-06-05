@@ -14,6 +14,7 @@ module.exports.renderNewForm = (req, res) => {
 }
 
 module.exports.createCampground = async (req, res, next) => {
+    try{
     const geoData =await geocoder.forwardGeocode({
         query : req.body.campground.location,
         limit: 1
@@ -23,6 +24,9 @@ module.exports.createCampground = async (req, res, next) => {
     const camp = new Campground(req.body.campground);
     camp.geometry = geoData.body.features[0].geometry;
     camp.image = req.files.map(f => ({ url: f.path, filename: f.filename }));
+}catch(e){
+    console.log(e);
+} 
     camp.author = req.user._id;
     await camp.save();
     req.flash('success', 'Successfully made a new campground!');
